@@ -40,11 +40,11 @@ import android.util.Log;
 import com.zoterodroid.R;
 import com.zoterodroid.Constants;
 import com.zoterodroid.activity.Main;
-import com.zoterodroid.client.DeliciousApi;
+import com.zoterodroid.client.ZoteroApi;
 import com.zoterodroid.client.Update;
 import com.zoterodroid.platform.BookmarkManager;
 import com.zoterodroid.platform.TagManager;
-import com.zoterodroid.providers.BookmarkContent.Bookmark;
+import com.zoterodroid.providers.CitationContent.Citation;
 import com.zoterodroid.providers.TagContent.Tag;
 
 import org.apache.http.ParseException;
@@ -57,12 +57,12 @@ import java.util.ArrayList;
  * SyncAdapter implementation for syncing sample SyncAdapter contacts to the
  * platform ContactOperations provider.
  */
-public class BookmarkSyncAdapter extends AbstractThreadedSyncAdapter {
-    private static final String TAG = "BookmarkSyncAdapter";
+public class CitationSyncAdapter extends AbstractThreadedSyncAdapter {
+    private static final String TAG = "CitationSyncAdapter";
 
     private final Context mContext;
 
-    public BookmarkSyncAdapter(Context context, boolean autoInitialize) {
+    public CitationSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         mContext = context;
     }
@@ -94,7 +94,7 @@ public class BookmarkSyncAdapter extends AbstractThreadedSyncAdapter {
     	Update update = null;
     	String username = account.name;
 
-    	update = DeliciousApi.lastUpdate(account, mContext);
+    	update = ZoteroApi.lastUpdate(account, mContext);
 		
 		if(notifyPref && update.getInboxNew() > 0) {
 			NotificationManager nm = (NotificationManager)mContext.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -108,29 +108,29 @@ public class BookmarkSyncAdapter extends AbstractThreadedSyncAdapter {
     	
     	if(update.getLastUpdate() > lastUpdate) {
 	
-			ArrayList<Bookmark> addBookmarkList = new ArrayList<Bookmark>();
-			ArrayList<Bookmark> updateBookmarkList = new ArrayList<Bookmark>();
-			ArrayList<Bookmark> changeList = new ArrayList<Bookmark>();
-			ArrayList<Bookmark> addList = new ArrayList<Bookmark>();
-			ArrayList<Bookmark> updateList = new ArrayList<Bookmark>();
+			ArrayList<Citation> addBookmarkList = new ArrayList<Citation>();
+			ArrayList<Citation> updateBookmarkList = new ArrayList<Citation>();
+			ArrayList<Citation> changeList = new ArrayList<Citation>();
+			ArrayList<Citation> addList = new ArrayList<Citation>();
+			ArrayList<Citation> updateList = new ArrayList<Citation>();
 			ArrayList<Tag> tagList = new ArrayList<Tag>();
 
 			if(lastUpdate == 0){
 				Log.d("BookmarkSync", "In Bookmark Load");
-				tagList = DeliciousApi.getTags(account, mContext);
-				addBookmarkList = DeliciousApi.getAllBookmarks(null, account, mContext);
+				tagList = ZoteroApi.getTags(account, mContext);
+				addBookmarkList = ZoteroApi.getAllBookmarks(null, account, mContext);
 			} else {
 				Log.d("BookmarkSync", "In Bookmark Update");
-				tagList = DeliciousApi.getTags(account, mContext);
-				changeList = DeliciousApi.getChangedBookmarks(account, mContext);
+				tagList = ZoteroApi.getTags(account, mContext);
+				changeList = ZoteroApi.getChangedBookmarks(account, mContext);
 				
-				for(Bookmark b : changeList){
+				for(Citation b : changeList){
 				
-					String[] projection = new String[] {Bookmark.Hash, Bookmark.Meta};
-					String selection = Bookmark.Hash + "=?";
+					String[] projection = new String[] {Citation.Hash, Citation.Meta};
+					String selection = Citation.Hash + "=?";
 					String[] selectionArgs = new String[] {b.getHash()};
 					
-					Uri bookmarks = Bookmark.CONTENT_URI;
+					Uri bookmarks = Citation.CONTENT_URI;
 					
 					Cursor c = mContext.getContentResolver().query(bookmarks, projection, selection, selectionArgs, null);
 					
@@ -139,7 +139,7 @@ public class BookmarkSyncAdapter extends AbstractThreadedSyncAdapter {
 					}
 					
 					if(c.moveToFirst()){
-						int metaColumn = c.getColumnIndex(Bookmark.Meta);
+						int metaColumn = c.getColumnIndex(Citation.Meta);
 						
 						BookmarkManager.SetLastUpdate(b, update.getLastUpdate(), username, mContext);
 						Log.d(b.getHash(), Long.toString(update.getLastUpdate()));
@@ -157,23 +157,23 @@ public class BookmarkSyncAdapter extends AbstractThreadedSyncAdapter {
 				BookmarkManager.DeleteOldBookmarks(update.getLastUpdate(), username, mContext);
 				
 				ArrayList<String> addHashes = new ArrayList<String>();
-				for(Bookmark b : addList){
+				for(Citation b : addList){
 					addHashes.add(b.getHash());
 				}
 				Log.d("add size", Integer.toString(addHashes.size()));
 				syncResult.stats.numInserts = addHashes.size();
 				if(addHashes.size() > 0) {
-					addBookmarkList = DeliciousApi.getBookmark(addHashes, account, mContext);
+					addBookmarkList = ZoteroApi.getBookmark(addHashes, account, mContext);
 				}
 				
 				ArrayList<String> updateHashes = new ArrayList<String>();
-				for(Bookmark b : updateList){
+				for(Citation b : updateList){
 					updateHashes.add(b.getHash());
 				}
 				Log.d("update size", Integer.toString(updateHashes.size()));
 				syncResult.stats.numUpdates = updateHashes.size();
 				if(updateHashes.size() > 0) {
-					updateBookmarkList = DeliciousApi.getBookmark(updateHashes, account, mContext);
+					updateBookmarkList = ZoteroApi.getBookmark(updateHashes, account, mContext);
 				}
 			}
 			
@@ -183,13 +183,13 @@ public class BookmarkSyncAdapter extends AbstractThreadedSyncAdapter {
 			}
 
 			if(!addBookmarkList.isEmpty()){				
-				for(Bookmark b : addBookmarkList){
+				for(Citation b : addBookmarkList){
 					BookmarkManager.AddBookmark(b, username, mContext);
 				}
 			}
 			
 			if(!updateBookmarkList.isEmpty()){		
-				for(Bookmark b : updateBookmarkList){
+				for(Citation b : updateBookmarkList){
 					BookmarkManager.UpdateBookmark(b, username, mContext);
 				}
 			}

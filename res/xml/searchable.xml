@@ -25,6 +25,6 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:label="@string/tag_search_label"
 	android:hint="@string/tag_search_hint"
-	android:searchSuggestAuthority="com.zoterodroid.providers.BookmarkContentProvider"
+	android:searchSuggestAuthority="com.zoterodroid.providers.CitationContentProvider"
 	android:searchSuggestIntentAction="android.Intent.action.VIEW"
 	android:includeInGlobalSearch="true" />

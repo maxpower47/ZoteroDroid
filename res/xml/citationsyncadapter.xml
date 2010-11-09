@@ -24,7 +24,7 @@
 <!-- The attributes in this XML file provide configuration information -->
 <!-- for the SyncAdapter. -->
 <sync-adapter xmlns:android="http://schemas.android.com/apk/res/android"
-    android:contentAuthority="com.zoterodroid.providers.BookmarkContentProvider"
+    android:contentAuthority="com.zoterodroid.providers.CitationContentProvider"
     android:accountType="com.zoterodroid"
     android:supportsUploading="false" />
 

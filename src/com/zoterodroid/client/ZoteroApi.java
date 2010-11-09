@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.auth.AuthScope;
@@ -46,13 +45,11 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import com.zoterodroid.Constants;
 import com.zoterodroid.authenticator.AuthToken;
-import com.zoterodroid.authenticator.OauthUtilities;
-import com.zoterodroid.providers.BookmarkContent.Bookmark;
+import com.zoterodroid.providers.CitationContent.Citation;
 import com.zoterodroid.providers.TagContent.Tag;
 
-public class DeliciousApi {
+public class ZoteroApi {
 	
     private static final String TAG = "ZoteroApi";
 
@@ -69,7 +66,6 @@ public class DeliciousApi {
     private static DefaultHttpClient mHttpClient;
     
     private static final String SCHEME = "https";
-    private static final String SCHEME_HTTP = "http";
     private static final String ZOTERO_AUTHORITY = "api.del.icio.us";
     private static final int PORT = 443;
  
@@ -105,7 +101,7 @@ public class DeliciousApi {
     	Update update = null;
     	String url = LAST_UPDATE_URI;
     	
-    	response = DeliciousApiCall(url, params, account, context);
+    	response = ZoteroApiCall(url, params, account, context);
     	
         if (response.contains("<?xml")) {
         	update = Update.valueOf(response);
@@ -116,7 +112,7 @@ public class DeliciousApi {
         return update;
     }
     
-    public static Boolean addBookmark(Bookmark bookmark, Account account, Context context) 
+    public static Boolean addBookmark(Citation bookmark, Account account, Context context) 
     	throws Exception {
 
     	TreeMap<String, String> params = new TreeMap<String, String>();
@@ -133,7 +129,7 @@ public class DeliciousApi {
 		String url = ADD_BOOKMARKS_URI;
 		String response = null;
 
-    	response = DeliciousApiCall(url, params, account, context);
+    	response = ZoteroApiCall(url, params, account, context);
 
         if (response.contains("<result code=\"done\" />")) {
             return true;
@@ -160,7 +156,7 @@ public class DeliciousApi {
      * @return list The list of bookmarks received from the server.
      * @throws AuthenticationException 
      */
-    public static Boolean deleteBookmark(Bookmark bookmark, Account account, Context context) 
+    public static Boolean deleteBookmark(Citation bookmark, Account account, Context context) 
     	throws IOException, AuthenticationException {
 
     	TreeMap<String, String> params = new TreeMap<String, String>();
@@ -169,7 +165,7 @@ public class DeliciousApi {
 
     	params.put("url", bookmark.getUrl());
 
-    	response = DeliciousApiCall(url, params, account, context);
+    	response = ZoteroApiCall(url, params, account, context);
     	
         if (response.contains("<result code=\"done\"")) {
             return true;
@@ -188,10 +184,10 @@ public class DeliciousApi {
      * @return list The list of bookmarks received from the server.
      * @throws AuthenticationException 
      */
-    public static ArrayList<Bookmark> getBookmark(ArrayList<String> hashes, Account account,
+    public static ArrayList<Citation> getBookmark(ArrayList<String> hashes, Account account,
         Context context) throws IOException, AuthenticationException {
 
-    	ArrayList<Bookmark> bookmarkList = new ArrayList<Bookmark>();
+    	ArrayList<Citation> bookmarkList = new ArrayList<Citation>();
     	TreeMap<String, String> params = new TreeMap<String, String>();
     	String hashString = "";
     	String response = null;
@@ -206,10 +202,10 @@ public class DeliciousApi {
     	params.put("meta", "yes");
     	params.put("hashes", hashString);
 
-    	response = DeliciousApiCall(url, params, account, context);
+    	response = ZoteroApiCall(url, params, account, context);
     	
         if (response.contains("<?xml")) {
-            bookmarkList = Bookmark.valueOf(response);
+            bookmarkList = Citation.valueOf(response);
         } else {
             Log.e(TAG, "Server error in fetching bookmark list");
             throw new IOException();
@@ -226,10 +222,10 @@ public class DeliciousApi {
      * @return list The list of bookmarks received from the server.
      * @throws AuthenticationException 
      */
-    public static ArrayList<Bookmark> getAllBookmarks(String tagName, Account account, Context context) 
+    public static ArrayList<Citation> getAllBookmarks(String tagName, Account account, Context context) 
     	throws IOException, AuthenticationException {
     	
-    	ArrayList<Bookmark> bookmarkList = new ArrayList<Bookmark>();
+    	ArrayList<Citation> bookmarkList = new ArrayList<Citation>();
     	String response = null;
     	TreeMap<String, String> params = new TreeMap<String, String>();
     	String url = FETCH_BOOKMARKS_URI;
@@ -240,11 +236,11 @@ public class DeliciousApi {
     	
     	params.put("meta", "yes");
 
-    	response = DeliciousApiCall(url, params, account, context);
+    	response = ZoteroApiCall(url, params, account, context);
     	
         if (response.contains("<?xml")) {
 
-        	bookmarkList = Bookmark.valueOf(response);
+        	bookmarkList = Citation.valueOf(response);
          
         } else {
             Log.e(TAG, "Server error in fetching bookmark list");
@@ -262,21 +258,21 @@ public class DeliciousApi {
      * @return list The list of bookmarks received from the server.
      * @throws AuthenticationException 
      */
-    public static ArrayList<Bookmark> getChangedBookmarks(Account account, Context context) 
+    public static ArrayList<Citation> getChangedBookmarks(Account account, Context context) 
     	throws IOException, AuthenticationException {
     	
-    	ArrayList<Bookmark> bookmarkList = new ArrayList<Bookmark>();
+    	ArrayList<Citation> bookmarkList = new ArrayList<Citation>();
     	String response = null;
     	TreeMap<String, String> params = new TreeMap<String, String>();
     	String url = FETCH_CHANGED_BOOKMARKS_URI;
 
     	params.put("hashes", "yes");
 
-    	response = DeliciousApiCall(url, params, account, context);
+    	response = ZoteroApiCall(url, params, account, context);
 
         if (response.contains("<?xml")) {
 
-        	bookmarkList = Bookmark.valueOf(response);
+        	bookmarkList = Citation.valueOf(response);
          
         } else {
             Log.e(TAG, "Server error in fetching bookmark list");
@@ -302,7 +298,7 @@ public class DeliciousApi {
     	TreeMap<String, String> params = new TreeMap<String, String>();
     	String url = FETCH_TAGS_URI;
     	  	
-    	response = DeliciousApiCall(url, params, account, context);
+    	response = ZoteroApiCall(url, params, account, context);
     	Log.d("loadTagResponse", response);
     	
         if (response.contains("<?xml")) {
@@ -314,11 +310,8 @@ public class DeliciousApi {
         return tagList;
     }
     
-    private static String DeliciousApiCall(String url, TreeMap<String, String> params, 
+    private static String ZoteroApiCall(String url, TreeMap<String, String> params, 
     		Account account, Context context) throws IOException, AuthenticationException{
-
-    	final AccountManager am = AccountManager.get(context);
-    	String authtype = am.getUserData(account, Constants.PREFS_AUTH_TYPE);
     	
     	String username = account.name;
     	String authtoken = null;
@@ -328,13 +321,8 @@ public class DeliciousApi {
     	AuthToken at = new AuthToken(context, account);
     	authtoken = at.getAuthToken();
     	
-    	if(authtype.equals(Constants.AUTH_TYPE_OAUTH)) {
-    		path = "v2/" + url;
-    		scheme = SCHEME_HTTP;
-    	} else {
-    		path = "v1/" + url;
-    		scheme = SCHEME;
-    	}
+    	path = "v1/" + url;
+    	scheme = SCHEME;
     	
     	HttpResponse resp = null;
     	HttpGet post = null;
@@ -349,28 +337,16 @@ public class DeliciousApi {
 		
 		Log.d("apiCallUrl", builder.build().toString().replace("%3A", ":").replace("%2F", "/").replace("%2B", "+").replace("%3F", "?").replace("%3D", "="));
 		post = new HttpGet(builder.build().toString().replace("%3A", ":").replace("%2F", "/").replace("%2B", "+").replace("%3F", "?").replace("%3D", "="));
-		HttpHost host = new HttpHost(ZOTERO_AUTHORITY);
+
 		maybeCreateHttpClient();
 		post.setHeader("User-Agent", "ZoteroDroid");
     	
-
-    	if(authtype.equals(Constants.AUTH_TYPE_OAUTH)) {
-    		Log.d("apiCall", "oauth");
-    		String tokenSecret = am.getUserData(account, Constants.OAUTH_TOKEN_SECRET_PROPERTY);
-
-			OauthUtilities.signRequest(post, params, authtoken, tokenSecret);
-
-			Log.d("header", post.getHeaders("Authorization")[0].getValue());
+        CredentialsProvider provider = mHttpClient.getCredentialsProvider();
+        Credentials credentials = new UsernamePasswordCredentials(username, authtoken);
+        provider.setCredentials(SCOPE, credentials);
+        
+        resp = mHttpClient.execute(post);
 	        
-	        resp = mHttpClient.execute(host, post);
-
-    	} else{ 
-	        CredentialsProvider provider = mHttpClient.getCredentialsProvider();
-	        Credentials credentials = new UsernamePasswordCredentials(username, authtoken);
-	        provider.setCredentials(SCOPE, credentials);
-	        
-	        resp = mHttpClient.execute(post);
-    	}
     	if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
     		return EntityUtils.toString(resp.getEntity());
     	} else if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {

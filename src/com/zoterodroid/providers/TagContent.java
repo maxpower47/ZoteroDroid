@@ -38,7 +38,7 @@ public class TagContent {
 
 	public static class Tag implements BaseColumns {
 		public static final Uri CONTENT_URI = Uri.parse("content://" + 
-				BookmarkContentProvider.AUTHORITY + "/tag");
+				CitationContentProvider.AUTHORITY + "/tag");
 		
 		public static final String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.zoterodroid.tags";
 		

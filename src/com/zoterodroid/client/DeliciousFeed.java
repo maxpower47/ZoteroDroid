@@ -40,7 +40,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.zoterodroid.providers.BookmarkContent.Bookmark;
+import com.zoterodroid.providers.CitationContent.Citation;
 import com.zoterodroid.providers.TagContent.Tag;
 
 import android.accounts.Account;
@@ -199,7 +199,7 @@ public class DeliciousFeed {
      *        account
      * @return list The list of bookmarks received from the server.
      */
-    public static ArrayList<Bookmark> fetchFriendBookmarks(String username, String tagName, int limit)
+    public static ArrayList<Citation> fetchFriendBookmarks(String username, String tagName, int limit)
     	throws JSONException, ParseException, IOException, AuthenticationException {
     	
     	String url = FETCH_FRIEND_BOOKMARKS_URI + username;
@@ -211,7 +211,7 @@ public class DeliciousFeed {
         final HttpGet post = new HttpGet(url);
         maybeCreateHttpClient();
         
-        final ArrayList<Bookmark> bookmarkList = new ArrayList<Bookmark>();
+        final ArrayList<Citation> bookmarkList = new ArrayList<Citation>();
 
         final HttpResponse resp = mHttpClient.execute(post);
         final String response = EntityUtils.toString(resp.getEntity());
@@ -222,7 +222,7 @@ public class DeliciousFeed {
             Log.d(TAG, response);
             
             for (int i = 0; i < bookmarks.length(); i++) {
-                bookmarkList.add(Bookmark.valueOf(bookmarks.getJSONObject(i)));
+                bookmarkList.add(Citation.valueOf(bookmarks.getJSONObject(i)));
             }
         } else {
             if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
@@ -244,13 +244,13 @@ public class DeliciousFeed {
      *        account
      * @return list The list of bookmarks received from the server.
      */
-    public static ArrayList<Bookmark> fetchNetworkRecent(String userName)
+    public static ArrayList<Citation> fetchNetworkRecent(String userName)
     	throws JSONException, ParseException, IOException, AuthenticationException {
 
         final HttpGet post = new HttpGet(FETCH_NETWORK_RECENT_BOOKMARKS_URI + userName + "?count=30");
         maybeCreateHttpClient();
         
-        final ArrayList<Bookmark> bookmarkList = new ArrayList<Bookmark>();
+        final ArrayList<Citation> bookmarkList = new ArrayList<Citation>();
 
         final HttpResponse resp = mHttpClient.execute(post);
         final String response = EntityUtils.toString(resp.getEntity());
@@ -261,7 +261,7 @@ public class DeliciousFeed {
             Log.d(TAG, response);
             
             for (int i = 0; i < bookmarks.length(); i++) {
-                bookmarkList.add(Bookmark.valueOf(bookmarks.getJSONObject(i)));
+                bookmarkList.add(Citation.valueOf(bookmarks.getJSONObject(i)));
             }
         } else {
             if (resp.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {

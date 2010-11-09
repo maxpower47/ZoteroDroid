@@ -30,9 +30,9 @@ import android.os.IBinder;
  * ACTION_AUTHENTICATOR_INTENT. It instantiates the syncadapter and returns its
  * IBinder.
  */
-public class BookmarkSyncService extends Service {
+public class CitationSyncService extends Service {
     private static final Object sSyncAdapterLock = new Object();
-    private static BookmarkSyncAdapter sSyncAdapter = null;
+    private static CitationSyncAdapter sSyncAdapter = null;
 
     /*
      * {@inheritDoc}
@@ -41,7 +41,7 @@ public class BookmarkSyncService extends Service {
     public void onCreate() {
         synchronized (sSyncAdapterLock) {
             if (sSyncAdapter == null) {
-                sSyncAdapter = new BookmarkSyncAdapter(getApplicationContext(), true);
+                sSyncAdapter = new CitationSyncAdapter(getApplicationContext(), true);
             }
         }
     }

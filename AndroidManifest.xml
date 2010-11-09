@@ -58,11 +58,11 @@
         		<data android:scheme="content" android:host="com.zoterodroid" android:path="/tags"/>
 			</intent-filter>
         </activity>
-        <activity android:name=".activity.BrowseBookmarks" >
+        <activity android:name=".activity.BrowseCitations" >
         	<intent-filter>
         		<action android:name="android.intent.action.VIEW" />
         		<category android:name="android.intent.category.DEFAULT" />
-        		<data android:scheme="content" android:host="com.zoterodroid" android:path="/bookmarks"/>
+        		<data android:scheme="content" android:host="com.zoterodroid" android:path="/citations"/>
         	</intent-filter>
         	<intent-filter>
         		<action android:name="android.intent.action.VIEW" />
@@ -81,7 +81,6 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.OauthLogin" />
         <activity android:name=".activity.Preferences" />
         <!-- The authenticator service -->
         <service
@@ -96,27 +95,14 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
-            android:name=".syncadapter.ContactSyncService"
+            android:name=".syncadapter.CitationSyncService"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/contactsyncadapter" />
-            <meta-data
-                android:name="android.provider.CONTACTS_STRUCTURE"
-                android:resource="@xml/contacts" />
-        </service>
-        <service
-            android:name=".syncadapter.BookmarkSyncService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.content.SyncAdapter" />
-            </intent-filter>
-            <meta-data
-                android:name="android.content.SyncAdapter"
-                android:resource="@xml/bookmarksyncadapter" />
+                android:resource="@xml/citationsyncadapter" />
         </service>
         <activity
             android:name=".authenticator.AuthenticatorActivity"
@@ -124,18 +110,10 @@
             android:theme="@android:style/Theme.Dialog"
             android:excludeFromRecents="true">
         </activity>
-        <activity
-        	android:name=".activity.Profile">
-        	<intent-filter>
-        		<action android:name="android.intent.action.VIEW" />
-        		<category android:name="android.intent.category.DEFAULT" />
-        		<data android:mimeType="vnd.android.cursor.item/vnd.zoterodroid.profile" />
-        	</intent-filter>
-        </activity>
         <provider
-        	android:name="com.zoterodroid.providers.BookmarkContentProvider"
-        	android:authorities="com.zoterodroid.providers.BookmarkContentProvider" />
-        <meta-data android:name="android.app.default_searchable" android:value=".activity.BrowseBookmarks" />
+        	android:name="com.zoterodroid.providers.CitationContentProvider"
+        	android:authorities="com.zoterodroid.providers.CitationContentProvider" />
+        <meta-data android:name="android.app.default_searchable" android:value=".activity.BrowseCitations" />
         	
     </application>
 </manifest>

@@ -21,7 +21,7 @@
 
 package com.zoterodroid.platform;
 
-import com.zoterodroid.providers.BookmarkContent.Bookmark;
+import com.zoterodroid.providers.CitationContent.Citation;
 import com.zoterodroid.util.Md5Hash;
 
 import android.content.ContentValues;
@@ -31,7 +31,7 @@ import android.util.Log;
 
 public class BookmarkManager {
 	
-	public static void AddBookmark(Bookmark bookmark, String account, Context context) {
+	public static void AddBookmark(Citation bookmark, String account, Context context) {
 		String url = bookmark.getUrl();
 
 		if(!url.endsWith("/")){
@@ -45,60 +45,60 @@ public class BookmarkManager {
 		} else hash = bookmark.getHash();
 		
 		ContentValues values = new ContentValues();
-		values.put(Bookmark.Description, bookmark.getDescription());
-		values.put(Bookmark.Url, url);
-		values.put(Bookmark.Notes, bookmark.getNotes());
-		values.put(Bookmark.Tags, bookmark.getTags());
-		values.put(Bookmark.Hash, hash);
-		values.put(Bookmark.Meta, bookmark.getMeta());
-		values.put(Bookmark.Time, bookmark.getTime());
-		values.put(Bookmark.Account, account);
+		values.put(Citation.Description, bookmark.getDescription());
+		values.put(Citation.Url, url);
+		values.put(Citation.Notes, bookmark.getNotes());
+		values.put(Citation.Tags, bookmark.getTags());
+		values.put(Citation.Hash, hash);
+		values.put(Citation.Meta, bookmark.getMeta());
+		values.put(Citation.Time, bookmark.getTime());
+		values.put(Citation.Account, account);
 		
-		context.getContentResolver().insert(Bookmark.CONTENT_URI, values);
+		context.getContentResolver().insert(Citation.CONTENT_URI, values);
 	}
 	
-	public static void UpdateBookmark(Bookmark bookmark, String account, Context context){
+	public static void UpdateBookmark(Citation bookmark, String account, Context context){
 		
-		String selection = Bookmark.Hash + "='" + bookmark.getHash() + "' AND " +
-							Bookmark.Account + " = '" + account + "'";
+		String selection = Citation.Hash + "='" + bookmark.getHash() + "' AND " +
+							Citation.Account + " = '" + account + "'";
 		
 		ContentValues values = new ContentValues();
-		values.put(Bookmark.Description, bookmark.getDescription());
-		values.put(Bookmark.Url, bookmark.getUrl());
-		values.put(Bookmark.Notes, bookmark.getNotes());
-		values.put(Bookmark.Tags, bookmark.getTags());
-		values.put(Bookmark.Meta, bookmark.getMeta());
-		values.put(Bookmark.Time, bookmark.getTime());
+		values.put(Citation.Description, bookmark.getDescription());
+		values.put(Citation.Url, bookmark.getUrl());
+		values.put(Citation.Notes, bookmark.getNotes());
+		values.put(Citation.Tags, bookmark.getTags());
+		values.put(Citation.Meta, bookmark.getMeta());
+		values.put(Citation.Time, bookmark.getTime());
 		
-		context.getContentResolver().update(Bookmark.CONTENT_URI, values, selection, null);
+		context.getContentResolver().update(Citation.CONTENT_URI, values, selection, null);
 		
 	}
 
-	public static void DeleteBookmark(Bookmark bookmark, Context context){
+	public static void DeleteBookmark(Citation bookmark, Context context){
 		
 		String selection = BaseColumns._ID + "=" + bookmark.getId();
 		
-		context.getContentResolver().delete(Bookmark.CONTENT_URI, selection, null);
+		context.getContentResolver().delete(Citation.CONTENT_URI, selection, null);
 	}
 	
-	public static void SetLastUpdate(Bookmark bookmark, Long lastUpdate, String account, Context context){
+	public static void SetLastUpdate(Citation bookmark, Long lastUpdate, String account, Context context){
 		
-		String selection = Bookmark.Hash + "='" + bookmark.getHash() + "' AND " +
-							Bookmark.Account + " = '" + account + "'";
+		String selection = Citation.Hash + "='" + bookmark.getHash() + "' AND " +
+							Citation.Account + " = '" + account + "'";
 		
 		ContentValues values = new ContentValues();	
-		values.put(Bookmark.LastUpdate, lastUpdate);
+		values.put(Citation.LastUpdate, lastUpdate);
 		
-		context.getContentResolver().update(Bookmark.CONTENT_URI, values, selection, null);
+		context.getContentResolver().update(Citation.CONTENT_URI, values, selection, null);
 	}
 	
 	public static void DeleteOldBookmarks(Long lastUpdate, String account, Context context){
-		String selection = "(" + Bookmark.LastUpdate + "<" + Long.toString(lastUpdate) + " OR " +
-		Bookmark.LastUpdate + " is null) AND " +
-		Bookmark.Account + " = '" + account + "'";
+		String selection = "(" + Citation.LastUpdate + "<" + Long.toString(lastUpdate) + " OR " +
+		Citation.LastUpdate + " is null) AND " +
+		Citation.Account + " = '" + account + "'";
 		
 		Log.d("DeleteOldSelection", selection);
 		
-		context.getContentResolver().delete(Bookmark.CONTENT_URI, selection, null);
+		context.getContentResolver().delete(Citation.CONTENT_URI, selection, null);
 	}
 }

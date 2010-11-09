@@ -41,13 +41,13 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
 
-public class BookmarkContent {
+public class CitationContent {
 
-	public static class Bookmark implements BaseColumns {
+	public static class Citation implements BaseColumns {
 		public static final Uri CONTENT_URI = Uri.parse("content://" + 
-				BookmarkContentProvider.AUTHORITY + "/bookmark");
+				CitationContentProvider.AUTHORITY + "/bookmark");
 		
-		public static final  String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.zoterodroid.bookmarks";
+		public static final  String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.zoterodroid.citations";
 		
 		public static final String Account = "ACCOUNT";
 		public static final String Description = "DESCRIPTION";
@@ -111,28 +111,28 @@ public class BookmarkContent {
         	return mPrivate;
         }
         
-        public Bookmark() {
+        public Citation() {
         }
         
-        public Bookmark(String url, String description) {
+        public Citation(String url, String description) {
             mUrl = url;
             mDescription = description;
         }
         
-        public Bookmark(String url, String description, String notes) {
+        public Citation(String url, String description, String notes) {
             mUrl = url;
             mDescription = description;
             mNotes = notes;
         }
         
-        public Bookmark(String url, String description, String notes, String tags) {
+        public Citation(String url, String description, String notes, String tags) {
             mUrl = url;
             mDescription = description;
             mNotes = notes;
             mTags = tags;
         }
         
-        public Bookmark(String url, String description, String notes, String tags, Boolean priv) {
+        public Citation(String url, String description, String notes, String tags, Boolean priv) {
             mUrl = url;
             mDescription = description;
             mNotes = notes;
@@ -140,7 +140,7 @@ public class BookmarkContent {
             mPrivate = priv;
         }
         
-        public Bookmark(String url, String description, String notes, String tags, String hash, String meta, long time) {
+        public Citation(String url, String description, String notes, String tags, String hash, String meta, long time) {
             mUrl = url;
             mDescription = description;
             mNotes = notes;
@@ -150,7 +150,7 @@ public class BookmarkContent {
             mTime = time;
         }
         
-        public Bookmark(int id, String url, String description, String notes, String tags, String hash, String meta, long time) {
+        public Citation(int id, String url, String description, String notes, String tags, String hash, String meta, long time) {
             mId = id;
         	mUrl = url;
             mDescription = description;
@@ -161,7 +161,7 @@ public class BookmarkContent {
             mTime = time;
         }
         
-        public static ArrayList<Bookmark> valueOf(String userBookmark){
+        public static ArrayList<Citation> valueOf(String userBookmark){
         	SAXReader reader = new SAXReader();
         	InputSource inputSource = new InputSource(new StringReader(userBookmark));
         	Document document = null;
@@ -172,7 +172,7 @@ public class BookmarkContent {
 			}   	
         	
             String expression = "/posts/post";
-            ArrayList<Bookmark> list = new ArrayList<Bookmark>();
+            ArrayList<Citation> list = new ArrayList<Citation>();
            
         	List<Element> nodes = document.selectNodes(expression);
 			
@@ -199,14 +199,14 @@ public class BookmarkContent {
 					}
 				}
 				
-				list.add(new Bookmark(shref, stitle, snotes, stags, shash, smeta, d.getTime()));
+				list.add(new Citation(shref, stitle, snotes, stags, shash, smeta, d.getTime()));
 
 			}
 				
 			return list;
         }
         
-        public static Bookmark valueOf(JSONObject userBookmark) {
+        public static Citation valueOf(JSONObject userBookmark) {
             try {
                 final String url = userBookmark.getString("u");
                 final String description = userBookmark.getString("d");
@@ -215,7 +215,7 @@ public class BookmarkContent {
                 Log.d("bookmarkdescription", description);
                 Log.d("bookmarktags", tags.join(" ").replace("\"", ""));
 
-                return new Bookmark(url, description, "", tags.join(" ").replace("\"", ""));
+                return new Citation(url, description, "", tags.join(" ").replace("\"", ""));
             } catch (final Exception ex) {
                 Log.i("User.Bookmark", "Error parsing JSON user object");
             }

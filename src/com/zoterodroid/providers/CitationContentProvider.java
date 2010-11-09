@@ -22,7 +22,7 @@
 package com.zoterodroid.providers;
 
 import com.zoterodroid.Constants;
-import com.zoterodroid.providers.BookmarkContent.Bookmark;
+import com.zoterodroid.providers.CitationContent.Citation;
 import com.zoterodroid.providers.TagContent.Tag;
 
 import android.accounts.Account;
@@ -43,7 +43,7 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.util.Log;
 
-public class BookmarkContentProvider extends ContentProvider {
+public class CitationContentProvider extends ContentProvider {
 	
 	private AccountManager mAccountManager = null;
 	private Account mAccount = null;
@@ -52,16 +52,16 @@ public class BookmarkContentProvider extends ContentProvider {
 	private DatabaseHelper dbHelper;
 	private static final String DATABASE_NAME = "ZoteroBookmarks.db";
 	private static final int DATABASE_VERSION = 12;
-	private static final String BOOKMARK_TABLE_NAME = "bookmark";
+	private static final String CITATION_TABLE_NAME = "citation";
 	private static final String TAG_TABLE_NAME = "tag";
 	
-	private static final int Bookmarks = 1;
+	private static final int Citations = 1;
 	private static final int SearchSuggest = 2;
 	private static final int Tags = 3;
 	
 	private static final UriMatcher sURIMatcher = buildUriMatcher();
 	
-	public static final String AUTHORITY = "com.zoterodroid.providers.BookmarkContentProvider";
+	public static final String AUTHORITY = "com.zoterodroid.providers.CitationContentProvider";
 	
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 		
@@ -72,7 +72,7 @@ public class BookmarkContentProvider extends ContentProvider {
 		@Override
 		public void onCreate(SQLiteDatabase sqlDb) {
 
-			sqlDb.execSQL("Create table " + BOOKMARK_TABLE_NAME + 
+			sqlDb.execSQL("Create table " + CITATION_TABLE_NAME + 
 					" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 					"ACCOUNT TEXT, " +
 					"DESCRIPTION TEXT, " +
@@ -94,7 +94,7 @@ public class BookmarkContentProvider extends ContentProvider {
 
 		@Override
 		public void onUpgrade(SQLiteDatabase sqlDb, int oldVersion, int newVersion) {
-			sqlDb.execSQL("DROP TABLE IF EXISTS " + BOOKMARK_TABLE_NAME);
+			sqlDb.execSQL("DROP TABLE IF EXISTS " + CITATION_TABLE_NAME);
 			sqlDb.execSQL("DROP TABLE IF EXISTS " + TAG_TABLE_NAME);
 			onCreate(sqlDb);	
 		}
@@ -105,8 +105,8 @@ public class BookmarkContentProvider extends ContentProvider {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		int count;
 		switch (sURIMatcher.match(uri)) {
-			case Bookmarks:
-				count = db.delete(BOOKMARK_TABLE_NAME, where, whereArgs);
+			case Citations:
+				count = db.delete(CITATION_TABLE_NAME, where, whereArgs);
 				break;
 			case Tags:
 				count = db.delete(TAG_TABLE_NAME, where, whereArgs);
@@ -122,8 +122,8 @@ public class BookmarkContentProvider extends ContentProvider {
 	@Override
 	public String getType(Uri uri) {
 		switch(sURIMatcher.match(uri)){
-			case Bookmarks:
-				return Bookmark.CONTENT_TYPE;
+			case Citations:
+				return Citation.CONTENT_TYPE;
 			case SearchSuggest:
 				return SearchManager.SUGGEST_MIME_TYPE;
 			case Tags:
@@ -137,7 +137,7 @@ public class BookmarkContentProvider extends ContentProvider {
 	public Uri insert(Uri uri, ContentValues values) {
 		
 		switch(sURIMatcher.match(uri)) {
-			case Bookmarks:
+			case Citations:
 				return insertBookmark(uri, values);
 			case Tags:
 				return insertTag(uri, values);
@@ -148,9 +148,9 @@ public class BookmarkContentProvider extends ContentProvider {
 	
 	private Uri insertBookmark(Uri uri, ContentValues values){
 		db = dbHelper.getWritableDatabase();
-		long rowId = db.insert(BOOKMARK_TABLE_NAME, "", values);
+		long rowId = db.insert(CITATION_TABLE_NAME, "", values);
 		if(rowId > 0) {
-			Uri rowUri = ContentUris.appendId(BookmarkContent.Bookmark.CONTENT_URI.buildUpon(), rowId).build();
+			Uri rowUri = ContentUris.appendId(CitationContent.Citation.CONTENT_URI.buildUpon(), rowId).build();
 			getContext().getContentResolver().notifyChange(rowUri, null);
 			return rowUri;
 		}
@@ -179,8 +179,8 @@ public class BookmarkContentProvider extends ContentProvider {
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,	String[] selectionArgs, String sortOrder) {
 		switch(sURIMatcher.match(uri)) {
-			case Bookmarks:
-				return getBookmarks(uri, projection, selection, selectionArgs, sortOrder);
+			case Citations:
+				return getCitations(uri, projection, selection, selectionArgs, sortOrder);
 			case SearchSuggest:
 				String query = uri.getLastPathSegment().toLowerCase();
 				return getSearchSuggestions(query);
@@ -191,10 +191,10 @@ public class BookmarkContentProvider extends ContentProvider {
 		}
 	}
 	
-	private Cursor getBookmarks(Uri uri, String[] projection, String selection,	String[] selectionArgs, String sortOrder) {
+	private Cursor getCitations(Uri uri, String[] projection, String selection,	String[] selectionArgs, String sortOrder) {
 		SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
 		SQLiteDatabase rdb = dbHelper.getReadableDatabase();
-		qb.setTables(BOOKMARK_TABLE_NAME);
+		qb.setTables(CITATION_TABLE_NAME);
 		Cursor c = qb.query(rdb, projection, selection, selectionArgs, null, null, sortOrder);
 		c.setNotificationUri(getContext().getContentResolver(), uri);
 		return c;
@@ -235,7 +235,7 @@ public class BookmarkContentProvider extends ContentProvider {
 
 			do {
 				Uri.Builder data = Constants.CONTENT_URI_BASE.buildUpon();
-				data.appendEncodedPath("bookmarks");
+				data.appendEncodedPath("citations");
 				data.appendQueryParameter("username", mAccount.name);
 				data.appendQueryParameter("tagname", c.getString(nameColumn));
 				
@@ -246,19 +246,19 @@ public class BookmarkContentProvider extends ContentProvider {
 		c.close();
 		
 		SQLiteQueryBuilder bookmarkqb = new SQLiteQueryBuilder();	
-		bookmarkqb.setTables(BOOKMARK_TABLE_NAME);
+		bookmarkqb.setTables(CITATION_TABLE_NAME);
 		
-		String bookmarkselection = Bookmark.Description + " LIKE '%" + query + "%'";
+		String bookmarkselection = Citation.Description + " LIKE '%" + query + "%'";
 		
-		String[] bookmarkprojection = new String[] {BaseColumns._ID, Bookmark.Description, Bookmark.Url};
+		String[] bookmarkprojection = new String[] {BaseColumns._ID, Citation.Description, Citation.Url};
 
 		Cursor bookmarkc = bookmarkqb.query(rdb, bookmarkprojection, bookmarkselection, null, null, null, null);
 
 		int j = 0;
 		
 		if(bookmarkc.moveToFirst()){
-			int descColumn = bookmarkc.getColumnIndex(Bookmark.Description);
-			int urlColumn = bookmarkc.getColumnIndex(Bookmark.Url);
+			int descColumn = bookmarkc.getColumnIndex(Citation.Description);
+			int urlColumn = bookmarkc.getColumnIndex(Citation.Url);
 
 			do {			
 				mc.addRow(new Object[] {j++, bookmarkc.getString(descColumn), bookmarkc.getString(urlColumn)});
@@ -275,8 +275,8 @@ public class BookmarkContentProvider extends ContentProvider {
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
 		int count;
 		switch (sURIMatcher.match(uri)) {
-			case Bookmarks:
-				count = db.update(BOOKMARK_TABLE_NAME, values, selection, selectionArgs);
+			case Citations:
+				count = db.update(CITATION_TABLE_NAME, values, selection, selectionArgs);
 				break;
 			case Tags:
 				count = db.update(TAG_TABLE_NAME, values, selection, selectionArgs);
@@ -291,7 +291,7 @@ public class BookmarkContentProvider extends ContentProvider {
 	
     private static UriMatcher buildUriMatcher() {
         UriMatcher matcher =  new UriMatcher(UriMatcher.NO_MATCH);
-        matcher.addURI(AUTHORITY, "bookmark", Bookmarks);
+        matcher.addURI(AUTHORITY, "citation", Citations);
         matcher.addURI(AUTHORITY, "tag", Tags);
         matcher.addURI(AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY, SearchSuggest);
         matcher.addURI(AUTHORITY, SearchManager.SUGGEST_URI_PATH_QUERY + "/*", SearchSuggest);

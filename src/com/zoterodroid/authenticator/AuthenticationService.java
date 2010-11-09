@@ -53,8 +53,7 @@ public class AuthenticationService extends Service {
     public IBinder onBind(Intent intent) {
         if (Log.isLoggable(TAG, Log.VERBOSE)) {
             Log.v(TAG,
-                "getBinder()...  returning the AccountAuthenticator binder for intent "
-                    + intent);
+                "getBinder()...  returning the AccountAuthenticator binder for intent " + intent);
         }
         return mAuthenticator.getIBinder();
     }

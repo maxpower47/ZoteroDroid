@@ -24,7 +24,7 @@ package com.zoterodroid.listadapter;
 import java.util.ArrayList;
 
 import com.zoterodroid.R;
-import com.zoterodroid.providers.BookmarkContent.Bookmark;
+import com.zoterodroid.providers.CitationContent.Citation;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -33,11 +33,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class BookmarkListAdapter extends ArrayAdapter<Bookmark> {
+public class BookmarkListAdapter extends ArrayAdapter<Citation> {
 	
-	private ArrayList<Bookmark> bookmarks;
+	private ArrayList<Citation> bookmarks;
 	
-    public BookmarkListAdapter(Context context, int textViewResourceId, ArrayList<Bookmark> bookmarks) {
+    public BookmarkListAdapter(Context context, int textViewResourceId, ArrayList<Citation> bookmarks) {
         super(context, textViewResourceId, bookmarks);
         this.bookmarks = bookmarks;
     }
@@ -49,7 +49,7 @@ public class BookmarkListAdapter extends ArrayAdapter<Bookmark> {
             LayoutInflater vi = (LayoutInflater)this.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.bookmark_view, null);
         }
-        Bookmark o = bookmarks.get(position);
+        Citation o = bookmarks.get(position);
         if (o != null) {
          	TextView td = (TextView) v.findViewById(R.id.bookmark_description);
          	TextView tu = (TextView) v.findViewById(R.id.bookmark_tags);

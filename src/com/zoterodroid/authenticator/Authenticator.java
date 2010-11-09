@@ -34,7 +34,6 @@ import android.util.Log;
 
 import com.zoterodroid.R;
 import com.zoterodroid.Constants;
-import com.zoterodroid.client.LoginResult;
 import com.zoterodroid.client.NetworkUtilities;
 
 /**
@@ -97,8 +96,7 @@ class Authenticator extends AbstractAccountAuthenticator {
      * {@inheritDoc}
      */
     @Override
-    public Bundle editProperties(AccountAuthenticatorResponse response,
-        String accountType) {
+    public Bundle editProperties(AccountAuthenticatorResponse response, String accountType) {
         throw new UnsupportedOperationException();
     }
 
@@ -117,64 +115,28 @@ class Authenticator extends AbstractAccountAuthenticator {
         }
         final AccountManager am = AccountManager.get(mContext);
         final String password = am.getPassword(account);
-        final String authtype = am.getUserData(account, Constants.PREFS_AUTH_TYPE);
         
-        if(authtype.equals(Constants.AUTH_TYPE_ZOTERO)){
-        	Log.d("getAuthToken", "notoauth");
-        	
-	        if (password != null) {
-	            final boolean verified =
-	                onlineConfirmPassword(account, password);
-	            if (verified) {
-	                final Bundle result = new Bundle();
-	                result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-	                result.putString(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
-	                result.putString(AccountManager.KEY_AUTHTOKEN, password);
-	                return result;
-	            }
-	        }
-	        // the password was missing or incorrect, return an Intent to an
-	        // Activity that will prompt the user for the password.
-	        final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
-	        intent.putExtra(AuthenticatorActivity.PARAM_USERNAME, account.name);
-	        intent.putExtra(AuthenticatorActivity.PARAM_AUTHTOKEN_TYPE, authTokenType);
-	        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
-	        final Bundle bundle = new Bundle();
-	        bundle.putParcelable(AccountManager.KEY_INTENT, intent);
-	        return bundle;
-        } else {
-        	Log.d("getAuthToken", "oauth");
-    			
-        	String token;
-        	final String firstTime = am.getUserData(account, "first_time");
-
-        	if(firstTime != null && firstTime.equals("false")) {	
-        		String oldauthtoken = am.getUserData(account, Constants.OAUTH_TOKEN_PROPERTY);
-        		
-        		LoginResult lresult = NetworkUtilities.refreshOauthRequestToken(account, oldauthtoken, mContext);
-                
-                am.setUserData(account, Constants.OAUTH_TOKEN_SECRET_PROPERTY, lresult.getTokenSecret());
-                am.setUserData(account, Constants.OAUTH_TOKEN_PROPERTY, lresult.getToken());
-            	
-            	Log.d("loginresult token", lresult.getToken());
-            	Log.d("loginresult token secret", lresult.getTokenSecret());
-            	
-            	token = lresult.getToken();
-            	
-            	am.setAuthToken(account, authTokenType, token);
-
-        	} else {
-        		am.setUserData(account, "first_time", "false");
-                token = password;
-        	}
-        	
-            final Bundle result = new Bundle();
-            result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-            result.putString(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
-            result.putString(AccountManager.KEY_AUTHTOKEN, token);
-            return result;
-        	   	
+        if (password != null) {
+            final boolean verified =
+                onlineConfirmPassword(account, password);
+            if (verified) {
+                final Bundle result = new Bundle();
+                result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+                result.putString(AccountManager.KEY_ACCOUNT_TYPE, Constants.ACCOUNT_TYPE);
+                result.putString(AccountManager.KEY_AUTHTOKEN, password);
+                return result;
+            }
         }
+        // the password was missing or incorrect, return an Intent to an
+        // Activity that will prompt the user for the password.
+        final Intent intent = new Intent(mContext, AuthenticatorActivity.class);
+        intent.putExtra(AuthenticatorActivity.PARAM_USERNAME, account.name);
+        intent.putExtra(AuthenticatorActivity.PARAM_AUTHTOKEN_TYPE, authTokenType);
+        intent.putExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE, response);
+        final Bundle bundle = new Bundle();
+        bundle.putParcelable(AccountManager.KEY_INTENT, intent);
+        return bundle;
+
     }
 
     /**
@@ -208,7 +170,7 @@ class Authenticator extends AbstractAccountAuthenticator {
     	final String authtype = am.getUserData(account, Constants.PREFS_AUTH_TYPE);
     	
     	if(authtype.equals(Constants.AUTH_TYPE_ZOTERO)){
-    		return NetworkUtilities.deliciousAuthenticate(account.name, password, null, null);
+    		return NetworkUtilities.zoteroAuthenticate(account.name, password, null, null);
     	} else {
     		return true;
     	}

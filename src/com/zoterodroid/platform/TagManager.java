@@ -21,7 +21,7 @@
 
 package com.zoterodroid.platform;
 
-import com.zoterodroid.providers.BookmarkContent.Bookmark;
+import com.zoterodroid.providers.CitationContent.Citation;
 import com.zoterodroid.providers.TagContent.Tag;
 
 import android.content.ContentResolver;

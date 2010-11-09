@@ -28,12 +28,12 @@ import org.apache.http.auth.AuthenticationException;
 
 import com.zoterodroid.R;
 import com.zoterodroid.Constants;
-import com.zoterodroid.client.DeliciousApi;
+import com.zoterodroid.client.ZoteroApi;
 import com.zoterodroid.client.DeliciousFeed;
 import com.zoterodroid.listadapter.BookmarkListAdapter;
 import com.zoterodroid.platform.BookmarkManager;
 import com.zoterodroid.platform.TagManager;
-import com.zoterodroid.providers.BookmarkContent.Bookmark;
+import com.zoterodroid.providers.CitationContent.Citation;
 import com.zoterodroid.providers.TagContent.Tag;
 
 import android.accounts.Account;
@@ -59,7 +59,7 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Toast;
 
-public class BrowseBookmarks extends AppBaseActivity {
+public class BrowseCitations extends AppBaseActivity {
 	
 	private AccountManager mAccountManager;
 	private Account mAccount;
@@ -87,7 +87,7 @@ public class BrowseBookmarks extends AppBaseActivity {
 		
 		myself = mAccount.name.equals(username);
 		
-		ArrayList<Bookmark> bookmarkList = new ArrayList<Bookmark>();
+		ArrayList<Citation> bookmarkList = new ArrayList<Citation>();
 		
 		if(scheme.equals("content") && path.equals("/bookmarks") && myself){
 			
@@ -98,36 +98,36 @@ public class BrowseBookmarks extends AppBaseActivity {
 					setTitle("My Bookmarks");
 				}
 				
-				String[] projection = new String[] {Bookmark._ID, Bookmark.Url, Bookmark.Description, Bookmark.Meta, Bookmark.Tags};
+				String[] projection = new String[] {Citation._ID, Citation.Url, Citation.Description, Citation.Meta, Citation.Tags};
 				String selection = null;
 				String sortorder = null;
 				
 				if(tagname != null && tagname != "") {
-					selection = "(" + Bookmark.Tags + " LIKE '% " + tagname + " %' OR " +
-						Bookmark.Tags + " LIKE '% " + tagname + "' OR " +
-						Bookmark.Tags + " LIKE '" + tagname + " %' OR " +
-						Bookmark.Tags + " = '" + tagname + "') AND " +
-						Bookmark.Account + " = '" + username + "'";
+					selection = "(" + Citation.Tags + " LIKE '% " + tagname + " %' OR " +
+						Citation.Tags + " LIKE '% " + tagname + "' OR " +
+						Citation.Tags + " LIKE '" + tagname + " %' OR " +
+						Citation.Tags + " = '" + tagname + "') AND " +
+						Citation.Account + " = '" + username + "'";
 				}
 				
 				if(recent != null && recent.equals("1")){
-					sortorder = Bookmark.Time + " DESC";
+					sortorder = Citation.Time + " DESC";
 				}
 				
-				Uri bookmarks = Bookmark.CONTENT_URI;
+				Uri bookmarks = Citation.CONTENT_URI;
 				
 				Cursor c = managedQuery(bookmarks, projection, selection, null, sortorder);				
 				
 				if(c.moveToFirst()){
-					int idColumn = c.getColumnIndex(Bookmark._ID);
-					int urlColumn = c.getColumnIndex(Bookmark.Url);
-					int descriptionColumn = c.getColumnIndex(Bookmark.Description);
-					int tagsColumn = c.getColumnIndex(Bookmark.Tags);
-					int metaColumn = c.getColumnIndex(Bookmark.Meta);
+					int idColumn = c.getColumnIndex(Citation._ID);
+					int urlColumn = c.getColumnIndex(Citation.Url);
+					int descriptionColumn = c.getColumnIndex(Citation.Description);
+					int tagsColumn = c.getColumnIndex(Citation.Tags);
+					int metaColumn = c.getColumnIndex(Citation.Meta);
 					
 					do {
 						
-						Bookmark b = new Bookmark(c.getInt(idColumn), c.getString(urlColumn), 
+						Citation b = new Citation(c.getInt(idColumn), c.getString(urlColumn), 
 								c.getString(descriptionColumn), "", c.getString(tagsColumn), "", 
 								c.getString(metaColumn), 0);
 						
@@ -179,7 +179,7 @@ public class BrowseBookmarks extends AppBaseActivity {
 	
 		lv.setOnItemClickListener(new OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		    	Bookmark b = (Bookmark)lv.getItemAtPosition(position);
+		    	Citation b = (Citation)lv.getItemAtPosition(position);
 		    	
 		    	String url = b.getUrl();
 		    	Uri link = Uri.parse(url);
@@ -206,7 +206,7 @@ public class BrowseBookmarks extends AppBaseActivity {
 	@Override
 	public boolean onContextItemSelected(MenuItem aItem) {
 		AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo) aItem.getMenuInfo();
-		final Bookmark b = (Bookmark)lv.getItemAtPosition(menuInfo.position);
+		final Citation b = (Citation)lv.getItemAtPosition(menuInfo.position);
 		
 		switch (aItem.getItemId()) {
 			case 0:
@@ -226,7 +226,7 @@ public class BrowseBookmarks extends AppBaseActivity {
 	
 	private class DeleteBookmarkTask extends AsyncTask<BookmarkTaskArgs, Integer, Boolean>{
 		private Context context;
-		private Bookmark bookmark;
+		private Citation bookmark;
 		private Account account;
 		
 		@Override
@@ -236,7 +236,7 @@ public class BrowseBookmarks extends AppBaseActivity {
 			account = args[0].getAccount();
 			
 			try {
-				Boolean success = DeliciousApi.deleteBookmark(bookmark, account, context);
+				Boolean success = ZoteroApi.deleteBookmark(bookmark, account, context);
 				if(success){
 					BookmarkManager.DeleteBookmark(args[0].getBookmark(), context);
 					return true;
@@ -269,11 +269,11 @@ public class BrowseBookmarks extends AppBaseActivity {
 	}
 
 	private class BookmarkTaskArgs{
-		private Bookmark bookmark;
+		private Citation bookmark;
 		private Account account;
 		private Context context;
 		
-		public Bookmark getBookmark(){
+		public Citation getBookmark(){
 			return bookmark;
 		}
 		
@@ -285,7 +285,7 @@ public class BrowseBookmarks extends AppBaseActivity {
 			return context;
 		}
 		
-		public BookmarkTaskArgs(Bookmark b, Account a, Context c){
+		public BookmarkTaskArgs(Citation b, Account a, Context c){
 			bookmark = b;
 			account = a;
 			context = c;

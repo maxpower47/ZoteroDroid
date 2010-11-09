@@ -84,34 +84,6 @@ public class LoginResult {
 	
 	LoginResult(Boolean r, String response){
 		result = r;
-		
-    	String[] responseParams = response.split("&");
-    	for(String s : responseParams){
-    		if(s.contains(Constants.OAUTH_TOKEN_SECRET_PROPERTY + "=")){
-    			oauth_token_secret = s.split("=")[1];
-    		}
-    		if(s.contains(Constants.OAUTH_EXPIRES_IN_PROPERTY + "=")){
-    			oauth_expires_in = s.split("=")[1];
-    		}
-    		if(s.contains(Constants.OAUTH_REQUEST_AUTH_URL_PROPERTY + "=")){
-    			xoauth_request_auth_url = URLDecoder.decode(s.split("=")[1]);
-    		}
-    		if(s.contains(Constants.OAUTH_TOKEN_PROPERTY + "=")){
-    			oauth_token = s.split("=")[1];
-    		}
-    		if(s.contains(Constants.OAUTH_CALLBACK_CONFIRMED_PROPERTY + "=")){
-    			oauth_callback_confirmed = s.split("=")[1];
-    		}
-    		if(s.contains(Constants.OAUTH_YAHOO_GUID_PROPERTY + "=")){
-    			xoauth_yahoo_guid = s.split("=")[1];
-    		}
-    		if(s.contains(Constants.OAUTH_AUTHORIZATION_EXPIRES_IN_PROPERTY + "=")){
-    			oauth_authorization_expires_in = s.split("=")[1];
-    		}
-    		if(s.contains(Constants.OAUTH_SESSION_HANDLE_PROPERTY + "=")){
-    			oauth_session_handle = s.split("=")[1];
-    		}
-    	}
 	}
 	
 	

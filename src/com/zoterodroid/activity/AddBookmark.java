@@ -23,10 +23,10 @@ package com.zoterodroid.activity;
 
 import com.zoterodroid.R;
 import com.zoterodroid.Constants;
-import com.zoterodroid.client.DeliciousApi;
+import com.zoterodroid.client.ZoteroApi;
 import com.zoterodroid.platform.BookmarkManager;
 import com.zoterodroid.platform.TagManager;
-import com.zoterodroid.providers.BookmarkContent.Bookmark;
+import com.zoterodroid.providers.CitationContent.Citation;
 import com.zoterodroid.providers.TagContent.Tag;
 
 import android.accounts.Account;
@@ -53,7 +53,7 @@ public class AddBookmark extends Activity implements View.OnClickListener{
 	private Button mButtonSave;
 	private AccountManager mAccountManager;
 	private Account account;
-	private Bookmark bookmark;
+	private Citation bookmark;
 	private Context context;
 	Thread background;
 
@@ -97,7 +97,7 @@ public class AddBookmark extends Activity implements View.OnClickListener{
 		
 		Log.d("private", Boolean.toString(mPrivate.isChecked()));
 		
-		bookmark = new Bookmark(url, mEditDescription.getText().toString(), 
+		bookmark = new Citation(url, mEditDescription.getText().toString(), 
 			mEditNotes.getText().toString(), mEditTags.getText().toString(),
 			mPrivate.isChecked());
 		
@@ -117,7 +117,7 @@ public class AddBookmark extends Activity implements View.OnClickListener{
     
     private class AddBookmarkTask extends AsyncTask<BookmarkTaskArgs, Integer, Boolean>{
     	private Context context;
-    	private Bookmark bookmark;
+    	private Citation bookmark;
     	private Account account;
     	
     	@Override
@@ -127,7 +127,7 @@ public class AddBookmark extends Activity implements View.OnClickListener{
     		account = args[0].getAccount();
     		
     		try {
-    			Boolean success = DeliciousApi.addBookmark(bookmark, account, context);
+    			Boolean success = ZoteroApi.addBookmark(bookmark, account, context);
     			if(success){
     				BookmarkManager.AddBookmark(bookmark, account.name, context);
     				return true;
@@ -154,11 +154,11 @@ public class AddBookmark extends Activity implements View.OnClickListener{
     }
 
     private class BookmarkTaskArgs{
-    	private Bookmark bookmark;
+    	private Citation bookmark;
     	private Account account;
     	private Context context;
     	
-    	public Bookmark getBookmark(){
+    	public Citation getBookmark(){
     		return bookmark;
     	}
     	
@@ -170,7 +170,7 @@ public class AddBookmark extends Activity implements View.OnClickListener{
     		return context;
     	}
     	
-    	public BookmarkTaskArgs(Bookmark b, Account a, Context c){
+    	public BookmarkTaskArgs(Citation b, Account a, Context c){
     		bookmark = b;
     		account = a;
     		context = c;
