@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * ZoteroDroid - http://code.google.com/p/ZoteroDroid/
+ *
+ * Copyright (C) 2010 Matt Schmidt
+ *
+ * ZoteroDroid is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * ZoteroDroid is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ZoteroDroid; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * USA
+ */
+ -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="horizontal"
+	android:layout_width="fill_parent">
+	<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:id="@+id/tag_name"
+	    android:layout_height="fill_parent"
+	    android:layout_width="wrap_content"
+	    android:paddingLeft="10dip"
+	    android:paddingTop="3dip"
+	    android:paddingBottom="5dip"
+	    android:textSize="12pt"/>
+  	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  		android:orientation="horizontal"
+  		android:layout_width="fill_parent"
+  		android:layout_height="fill_parent"
+  		android:gravity="right">
+		<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:id="@+id/tag_count"
+		    android:layout_height="fill_parent"
+		    android:layout_width="wrap_content"
+		    android:gravity="right"
+		    android:textSize="10pt"
+		    android:paddingTop="6dip"
+		    android:paddingRight="15dip"/>
+	</LinearLayout>
+</LinearLayout>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * ZoteroDroid - http://code.google.com/p/ZoteroDroid/
+ *
+ * Copyright (C) 2010 Matt Schmidt
+ *
+ * ZoteroDroid is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * ZoteroDroid is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ZoteroDroid; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * USA
+ */
+ -->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Label for this package -->
+    <string name="label">Zotero</string>
+
+    <!-- Permission label -->
+    <string name="permlab_samplesyncadapterAuthPassword">access to passwords for Zotero accounts</string>
+    <!-- Permission description -->
+    <string name="permdesc_samplesyncadapterAuthPassword">Allows applications direct access to the passwords for the
+        Zotero account(s) you have configured.</string>
+
+    <!-- Permission label -->
+    <string name="permlab_samplesyncadapterAuth">view configured accounts</string>
+    <!-- Permission description -->
+    <string name="permdesc_samplesyncadapterAuth">Allows applications to see the usernames (email addresses) of
+        the Zotero account(s) you have configured.</string>
+    <string name="notification_login_error">Touch to sign into your Zotero account.</string>
+
+    <!-- Title string for Login activity-->
+    <string name="ui_activity_title">Sign-in</string>
+    <!-- Message shown in progress dialog while app connects to the server -->
+    <string name="ui_activity_authenticating">Authenticating\u2026</string>
+
+    <!-- AuthenticatorActivity -->
+    <skip />
+    <!-- Label above username EditText -->
+    <string name="login_activity_username_label">Username</string>
+    <!-- Label above password EditText -->
+    <string name="login_activity_password_label">Password</string>
+    <!-- Button to sign in after entering username and password -->
+    <string name="login_activity_ok_button">Sign in</string>
+    
+    <string name="login_authtype_ok_button">Continue</string>
+
+    <!-- Message shown in dialog if the username or password is invalid. -->
+    <string name="login_activity_loginfail_text_both">The username or password isn\'t valid. A Zotero account is
+        required. Please try again. </string>
+    <!-- Message shown in dialog if the password is invalid -->
+    <string name="login_activity_loginfail_text_pwonly">You entered the wrong password or your account has changed.
+        Please re-enter your password.</string>
+    <!-- Message shown in dialog to prompt the user for their password -->
+    <string name="login_activity_loginfail_text_pwmissing">Type the password for this account.</string>
+    <!-- Message shown if the provided account doesn't support the current activity. -->
+    <string name="login_activity_newaccount_text">Sign in to your Zotero account. </string>
+    
+    <string name="login_activity_authtype_text">Choose your account type. </string>
+
+    <!-- Button that takes the user to the "sign in" screen -->
+    <string name="sign_in_button_label">Sign in</string>
+    <!-- Button for going to the previous screen or step -->
+    <string name="back_button_label">Back</string>
+    <!-- Button to cancel the current operation -->
+    <string name="cancel_button_label">Cancel</string>
+    <string name="profile_action">Zotero</string>
+    <string name="view_profile">View Profile</string>
+    <string name="titleMain">Zotero</string>
+    <string name="menu_addbookmark_title">Add Bookmark</string>
+    <string name="menu_mybookmarks_title">My Bookmarks</string>
+    <string name="menu_settings_title">Settings</string>
+    <string name="add_button_save">Save</string>
+    <string name="add_title_url">URL</string>
+    <string name="add_title_description">Description</string>
+    <string name="add_title_notes">Notes</string>
+    <string name="add_title_tags">Tags</string>
+    <string name="tag_search_label">Tag</string>
+    <string name="tag_search_hint">Hint</string>
+    <string name="tag_search_text">Search Zotero</string>
+    
+    <string name="pref_notification_title">Display Notifications</string>
+    <string name="pref_notification_key">pref_notification</string>
+    <string name="pref_notification_summary">Display notifications when new links are received in your inbox.</string>
+    
+    <string name="pref_contact_bookmark_results_title">Contact Bookmarks</string>
+    <string name="pref_contact_bookmark_results_key">pref_contact_bookmark_results</string>
+    <string name="pref_contact_bookamrk_results_summary">Number of bookmarks to retrieve for network contacts.</string>
+</resources>

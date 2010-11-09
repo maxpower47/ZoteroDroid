@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * ZoteroDroid - http://code.google.com/p/ZoteroDroid/
+ *
+ * Copyright (C) 2010 Matt Schmidt
+ *
+ * ZoteroDroid is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published
+ * by the Free Software Foundation; either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * ZoteroDroid is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ZoteroDroid; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+ * USA
+ */
+ -->
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.zoterodroid"
+    android:versionCode="1"
+    android:versionName="0.1.0">
+    <uses-sdk android:minSdkVersion="5" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_SYNC_STATS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
+    
+    <application
+        android:icon="@drawable/icon"
+        android:label="@string/label">
+        <activity
+        	android:name=".activity.Main"
+        	android:label="@string/titleMain">
+        	<intent-filter>
+        		<action android:name="android.intent.action.MAIN" />
+        		<category android:name="android.intent.category.LAUNCHER" />
+        	</intent-filter>
+        </activity>
+        <activity android:name=".activity.BrowseTags">
+        	<intent-filter>
+        		<action android:name="android.intent.action.VIEW" />
+        		<category android:name="android.intent.category.DEFAULT" />
+        		<data android:scheme="content" android:host="com.zoterodroid" android:path="/tags"/>
+			</intent-filter>
+        </activity>
+        <activity android:name=".activity.BrowseBookmarks" >
+        	<intent-filter>
+        		<action android:name="android.intent.action.VIEW" />
+        		<category android:name="android.intent.category.DEFAULT" />
+        		<data android:scheme="content" android:host="com.zoterodroid" android:path="/bookmarks"/>
+        	</intent-filter>
+        	<intent-filter>
+        		<action android:name="android.intent.action.VIEW" />
+        		<category android:name="android.intent.category.DEFAULT" />
+        		<data android:scheme="content" android:host="com.zoterodroid" android:path="/network"/>
+        	</intent-filter>
+            <intent-filter>
+            	<action android:name="android.intent.action.SEARCH" />
+        	</intent-filter>
+        	<meta-data android:name="android.app.searchable" android:resource="@xml/searchable"/>
+        </activity>
+        <activity android:name=".activity.AddBookmark">
+        	<intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activity.OauthLogin" />
+        <activity android:name=".activity.Preferences" />
+        <!-- The authenticator service -->
+        <service
+            android:name=".authenticator.AuthenticationService"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+        <service
+            android:name=".syncadapter.ContactSyncService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/contactsyncadapter" />
+            <meta-data
+                android:name="android.provider.CONTACTS_STRUCTURE"
+                android:resource="@xml/contacts" />
+        </service>
+        <service
+            android:name=".syncadapter.BookmarkSyncService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/bookmarksyncadapter" />
+        </service>
+        <activity
+            android:name=".authenticator.AuthenticatorActivity"
+            android:label="@string/ui_activity_title"
+            android:theme="@android:style/Theme.Dialog"
+            android:excludeFromRecents="true">
+        </activity>
+        <activity
+        	android:name=".activity.Profile">
+        	<intent-filter>
+        		<action android:name="android.intent.action.VIEW" />
+        		<category android:name="android.intent.category.DEFAULT" />
+        		<data android:mimeType="vnd.android.cursor.item/vnd.zoterodroid.profile" />
+        	</intent-filter>
+        </activity>
+        <provider
+        	android:name="com.zoterodroid.providers.BookmarkContentProvider"
+        	android:authorities="com.zoterodroid.providers.BookmarkContentProvider" />
+        <meta-data android:name="android.app.default_searchable" android:value=".activity.BrowseBookmarks" />
+        	
+    </application>
+</manifest>
