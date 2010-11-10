@@ -22,20 +22,16 @@
 package com.zoterodroid.providers;
 
 import java.io.StringReader;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.xml.sax.InputSource;
-
-import com.zoterodroid.util.DateParser;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -45,120 +41,60 @@ public class CitationContent {
 
 	public static class Citation implements BaseColumns {
 		public static final Uri CONTENT_URI = Uri.parse("content://" + 
-				CitationContentProvider.AUTHORITY + "/bookmark");
+				CitationContentProvider.AUTHORITY + "/citation");
 		
 		public static final  String CONTENT_TYPE = "vnd.android.cursor.dir/vnd.zoterodroid.citations";
 		
 		public static final String Account = "ACCOUNT";
-		public static final String Description = "DESCRIPTION";
-		public static final String Url = "URL";
-		public static final String Notes = "NOTES";
-		public static final String Tags = "TAGS";
-		public static final String Hash = "HASH";
-		public static final String Meta = "META";
-		public static final String Time = "TIME";
-		public static final String LastUpdate = "LASTUPDATE";
+		public static final String Title = "TITLE";
+		public static final String Key = "KEY";
+		public static final String Item_Type = "ITEM_TYPE";
+		public static final String Creator_Summary = "CREATOR_SUMMARY";
 		
 		private int mId = 0;
 		private String mAccount = null;
-        private String mUrl = null;
-        private String mDescription = null;
-        private String mNotes = null;
-        private String mTags = null;
-        private String mHash = null;
-        private String mMeta = null;
-        private Boolean mPrivate = false;
-        private long mTime = 0;
-        private long mLastUpdate = 0;
+        private String mTitle = null;
+        private String mKey = null;
+        private String mItemType = null;
+        private String mCreatorSummary = null;
 
         public int getId(){
         	return mId;
         }
         
-        public String getUrl() {
-            return mUrl;
+        public String getTitle() {
+            return mTitle;
         }
 
-        public String getDescription() {
-            return mDescription;
+        public String getKey() {
+            return mKey;
         }
         
-        public String getNotes(){
-        	return mNotes;
+        public String getItemType(){
+        	return mItemType;
         }
         
-        public String getTags(){
-        	return mTags;
-        }
-        
-        public String getHash(){
-        	return mHash;
+        public String getCreatorSummary(){
+        	return mCreatorSummary;
         }
 
-        public String getMeta(){
-        	return mMeta;
-        }
-        
-        public long getTime(){
-        	return mTime;
-        }
-        
-        public long getLastUpdate(){
-        	return mLastUpdate;
-        }
-        
-        public Boolean getPrivate(){
-        	return mPrivate;
-        }
         
         public Citation() {
         }
         
-        public Citation(String url, String description) {
-            mUrl = url;
-            mDescription = description;
+        public Citation(String title, String key, String itemType, String creatorSummary) {
+        	mTitle = title;
+            mKey = key;
+            mItemType = itemType;
+            mCreatorSummary = creatorSummary;
         }
-        
-        public Citation(String url, String description, String notes) {
-            mUrl = url;
-            mDescription = description;
-            mNotes = notes;
-        }
-        
-        public Citation(String url, String description, String notes, String tags) {
-            mUrl = url;
-            mDescription = description;
-            mNotes = notes;
-            mTags = tags;
-        }
-        
-        public Citation(String url, String description, String notes, String tags, Boolean priv) {
-            mUrl = url;
-            mDescription = description;
-            mNotes = notes;
-            mTags = tags;
-            mPrivate = priv;
-        }
-        
-        public Citation(String url, String description, String notes, String tags, String hash, String meta, long time) {
-            mUrl = url;
-            mDescription = description;
-            mNotes = notes;
-            mTags = tags;
-            mHash = hash;
-            mMeta = meta;
-            mTime = time;
-        }
-        
-        public Citation(int id, String url, String description, String notes, String tags, String hash, String meta, long time) {
+               
+        public Citation(int id, String title, String key, String itemType, String creatorSummary) {
             mId = id;
-        	mUrl = url;
-            mDescription = description;
-            mNotes = notes;
-            mTags = tags;
-            mHash = hash;
-            mMeta = meta;
-            mTime = time;
+        	mTitle = title;
+            mKey = key;
+            mItemType = itemType;
+            mCreatorSummary = creatorSummary;
         }
         
         public static ArrayList<Citation> valueOf(String userBookmark){
@@ -171,55 +107,39 @@ public class CitationContent {
 				e1.printStackTrace();
 			}   	
         	
-            String expression = "/posts/post";
+			document.getRootElement().add(DocumentHelper.createNamespace("atom",
+				"http://www.w3.org/2005/Atom")); 
+			
+            String expression = "/atom:feed/atom:entry";
             ArrayList<Citation> list = new ArrayList<Citation>();
            
         	List<Element> nodes = document.selectNodes(expression);
 			
 			for(int i = 0; i < nodes.size(); i++){
-				String shref = nodes.get(i).attributeValue("href");
-				String stitle = nodes.get(i).attributeValue("description");
-				String snotes = nodes.get(i).attributeValue("extended");
-				String stags = nodes.get(i).attributeValue("tag");
-				String shash = nodes.get(i).attributeValue("hash");
-				String smeta = nodes.get(i).attributeValue("meta");
-				String stime = nodes.get(i).attributeValue("time");
-				String surl = nodes.get(i).attributeValue("url");
+				Node ntitle = nodes.get(i).selectSingleNode("atom:title");
+				Node nkey = nodes.get(i).selectSingleNode("zapi:key");
+				Node ntype = nodes.get(i).selectSingleNode("zapi:itemType");
+				Node ncreatorSummary = nodes.get(i).selectSingleNode("zapi:creatorSummary");
 				
-				if(shash == null)
-					shash = surl;
+				String stitle = null;
+				String skey = null;
+				String stype = null;
+				String screatorSummary = null;
 				
-				Date d = new Date(0);
-				if(stime != null && stime != ""){
-					try {
-						d = DateParser.parse(stime);
-					} catch (ParseException e) {
-						Log.d("Parse error", stime);
-						e.printStackTrace();
-					}
-				}
-				
-				list.add(new Citation(shref, stitle, snotes, stags, shash, smeta, d.getTime()));
+				if(ntitle != null)
+					stitle = ntitle.getText();
+				if(nkey != null)
+					skey = nkey.getText();
+				if(ntype != null)
+					stype = ntype.getText();
+				if(ncreatorSummary != null)
+					screatorSummary = ncreatorSummary.getText();
+
+				list.add(new Citation(stitle, skey, stype, screatorSummary));
 
 			}
 				
 			return list;
-        }
-        
-        public static Citation valueOf(JSONObject userBookmark) {
-            try {
-                final String url = userBookmark.getString("u");
-                final String description = userBookmark.getString("d");
-                final JSONArray tags = userBookmark.getJSONArray("t");
-                Log.d("bookmarkurl", url);
-                Log.d("bookmarkdescription", description);
-                Log.d("bookmarktags", tags.join(" ").replace("\"", ""));
-
-                return new Citation(url, description, "", tags.join(" ").replace("\"", ""));
-            } catch (final Exception ex) {
-                Log.i("User.Bookmark", "Error parsing JSON user object");
-            }
-            return null;
         }
 	}
 }

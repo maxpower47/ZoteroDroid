@@ -32,7 +32,6 @@ import android.util.Log;
 
 import com.zoterodroid.Constants;
 import com.zoterodroid.authenticator.AuthToken;
-import com.zoterodroid.client.DeliciousFeed;
 import com.zoterodroid.client.User;
 import com.zoterodroid.client.User.Status;
 import com.zoterodroid.platform.ContactManager;
@@ -65,34 +64,19 @@ public class ContactSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
         ContentProviderClient provider, SyncResult syncResult) {
-        List<User> users;
-        List<Status> statuses;
+
         try {
         	// use the account manager to request the credentials
         	AuthToken at = new AuthToken(mContext, account);
         	authtoken = at.getAuthToken();
         	 
             // fetch updates from the sample service over the cloud
-            users = DeliciousFeed.fetchFriendUpdates(account);
             // update platform contacts.
             Log.d(TAG, "Calling contactManager's sync contacts");
-            ContactManager.syncContacts(mContext, account.name, users);
-            // fetch and update status messages for all the synced users.
-            statuses = DeliciousFeed.fetchFriendStatuses(account);
-            ContactManager.insertStatuses(mContext, account.name, statuses);
-        } catch (final IOException e) {
-            Log.e(TAG, "IOException", e);
-            syncResult.stats.numIoExceptions++;
-        } catch (final AuthenticationException e) {
-            mAccountManager.invalidateAuthToken(Constants.ACCOUNT_TYPE, authtoken);
-            syncResult.stats.numAuthExceptions++;
-            Log.e(TAG, "AuthenticationException", e);
+
         } catch (final ParseException e) {
             syncResult.stats.numParseExceptions++;
             Log.e(TAG, "ParseException", e);
-        } catch (final JSONException e) {
-            syncResult.stats.numParseExceptions++;
-            Log.e(TAG, "JSONException", e);
         }
     }
 }

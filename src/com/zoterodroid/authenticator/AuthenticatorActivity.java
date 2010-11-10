@@ -186,10 +186,9 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity {
         if (mRequestNewAccount) {
         	
         	String userid = NetworkUtilities.getZoteroUserId(mUsername);
-        	
-        	mAccountManager.setUserData(account, Constants.PREFS_AUTH_USER_ID, userid);
-        	
+
             mAccountManager.addAccountExplicitly(account, mPassword, null);
+            mAccountManager.setUserData(account, Constants.PREFS_AUTH_USER_ID, userid);
             // Set contacts sync for this account.
             //ContentResolver.setSyncAutomatically(account, ContactsContract.AUTHORITY, true);
         } else {

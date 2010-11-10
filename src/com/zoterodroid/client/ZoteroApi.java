@@ -57,7 +57,7 @@ public class ZoteroApi {
     public static final int REGISTRATION_TIMEOUT = 30 * 1000; // ms
 
     public static final String FETCH_TAGS_URI = "tags/get";
-    public static final String FETCH_BOOKMARKS_URI = "posts/all";
+    public static final String FETCH_CITATIONS_URI = "users/<userID>/items/top";
     public static final String FETCH_CHANGED_BOOKMARKS_URI = "posts/all";
     public static final String FETCH_BOOKMARK_URI = "posts/get";
     public static final String LAST_UPDATE_URI = "posts/update";
@@ -66,7 +66,7 @@ public class ZoteroApi {
     private static DefaultHttpClient mHttpClient;
     
     private static final String SCHEME = "https";
-    private static final String ZOTERO_AUTHORITY = "api.del.icio.us";
+    private static final String ZOTERO_AUTHORITY = "api.zotero.org";
     private static final int PORT = 443;
  
     private static final AuthScope SCOPE = new AuthScope(ZOTERO_AUTHORITY, PORT);
@@ -110,69 +110,6 @@ public class ZoteroApi {
             throw new IOException();
         }
         return update;
-    }
-    
-    public static Boolean addBookmark(Citation bookmark, Account account, Context context) 
-    	throws Exception {
-
-    	TreeMap<String, String> params = new TreeMap<String, String>();
-    	  	
-		params.put("description", bookmark.getDescription());
-		params.put("extended", bookmark.getNotes());
-		params.put("tags", bookmark.getTags());
-		params.put("url", bookmark.getUrl());
-		
-		if(bookmark.getPrivate()){
-			params.put("shared", "no");
-		}
-		
-		String url = ADD_BOOKMARKS_URI;
-		String response = null;
-
-    	response = ZoteroApiCall(url, params, account, context);
-
-        if (response.contains("<result code=\"done\" />")) {
-            return true;
-        } else {
-        	if(response.contains("<result code=\"something went wrong\" />")){
-                Log.e(TAG, "Server error in adding bookmark");
-                throw new IOException();
-            } else if(response.contains("token_expired")){
-            	Log.d(TAG, "Token Expired");
-            	throw new TokenRejectedException();
-            } else{
-            	Log.e(TAG, "Unknown error in adding bookmark");
-            	throw new Exception();
-            }
-        }
-    }
-    
-    /**
-     * Delete a Bookmark
-     * 
-     * @param account The account being synced.
-     * @param authtoken The authtoken stored in the AccountManager for the
-     *        account
-     * @return list The list of bookmarks received from the server.
-     * @throws AuthenticationException 
-     */
-    public static Boolean deleteBookmark(Citation bookmark, Account account, Context context) 
-    	throws IOException, AuthenticationException {
-
-    	TreeMap<String, String> params = new TreeMap<String, String>();
-    	String response = null;
-    	String url = DELETE_BOOKMARK_URI;
-
-    	params.put("url", bookmark.getUrl());
-
-    	response = ZoteroApiCall(url, params, account, context);
-    	
-        if (response.contains("<result code=\"done\"")) {
-            return true;
-        } else {
-            Log.e(TAG, "Server error in fetching bookmark list");
-            throw new IOException();
-        }
     }
     
     /**
@@ -222,31 +159,25 @@ public class ZoteroApi {
      * @return list The list of bookmarks received from the server.
      * @throws AuthenticationException 
      */
-    public static ArrayList<Citation> getAllBookmarks(String tagName, Account account, Context context) 
+    public static ArrayList<Citation> getAllCitations(String tagName, Account account, String userid, Context context) 
     	throws IOException, AuthenticationException {
     	
-    	ArrayList<Citation> bookmarkList = new ArrayList<Citation>();
+    	ArrayList<Citation> citationList = new ArrayList<Citation>();
     	String response = null;
     	TreeMap<String, String> params = new TreeMap<String, String>();
-    	String url = FETCH_BOOKMARKS_URI;
-
-    	if(tagName != null && tagName != ""){
-    		params.put("tag", tagName);
-    	}
-    	
-    	params.put("meta", "yes");
+    	String url = FETCH_CITATIONS_URI.replace("<userID>", userid);
 
     	response = ZoteroApiCall(url, params, account, context);
     	
         if (response.contains("<?xml")) {
-
-        	bookmarkList = Citation.valueOf(response);
+        	Log.d("citationresp", response);
+        	citationList = Citation.valueOf(response);
          
         } else {
             Log.e(TAG, "Server error in fetching bookmark list");
             throw new IOException();
         }
-        return bookmarkList;
+        return citationList;
     }
     
     /**
@@ -315,13 +246,11 @@ public class ZoteroApi {
     	
     	String username = account.name;
     	String authtoken = null;
-    	String path = null;
     	String scheme = null;
     	
     	AuthToken at = new AuthToken(context, account);
     	authtoken = at.getAuthToken();
     	
-    	path = "v1/" + url;
     	scheme = SCHEME;
     	
     	HttpResponse resp = null;
@@ -330,13 +259,13 @@ public class ZoteroApi {
 		Uri.Builder builder = new Uri.Builder();
 		builder.scheme(scheme);
 		builder.authority(ZOTERO_AUTHORITY);
-		builder.appendEncodedPath(path);
+		builder.appendEncodedPath(url);
 		for(String key : params.keySet()){
 			builder.appendQueryParameter(key, params.get(key));
 		}
 		
-		Log.d("apiCallUrl", builder.build().toString().replace("%3A", ":").replace("%2F", "/").replace("%2B", "+").replace("%3F", "?").replace("%3D", "="));
-		post = new HttpGet(builder.build().toString().replace("%3A", ":").replace("%2F", "/").replace("%2B", "+").replace("%3F", "?").replace("%3D", "="));
+		Log.d("apiCallUrl", builder.build().toString());
+		post = new HttpGet(builder.build().toString());
 
 		maybeCreateHttpClient();
 		post.setHeader("User-Agent", "ZoteroDroid");
@@ -354,6 +283,5 @@ public class ZoteroApi {
     	} else {
     		throw new IOException();
     	}
-
     }
 }

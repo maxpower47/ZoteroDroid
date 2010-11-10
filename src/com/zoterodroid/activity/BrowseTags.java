@@ -25,7 +25,6 @@ import java.util.ArrayList;
 
 import com.zoterodroid.R;
 import com.zoterodroid.Constants;
-import com.zoterodroid.client.DeliciousFeed;
 import com.zoterodroid.listadapter.TagListAdapter;
 import com.zoterodroid.providers.TagContent.Tag;
 
@@ -94,8 +93,6 @@ public class BrowseTags extends AppBaseActivity {
 		} else {
 			try{
 				setTitle("Tags For " + username);
-				
-				tagList = DeliciousFeed.fetchFriendTags(username);
 				
 				setListAdapter(new TagListAdapter(this, R.layout.tag_view, tagList));	
 			}

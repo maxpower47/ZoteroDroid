@@ -33,11 +33,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class BookmarkListAdapter extends ArrayAdapter<Citation> {
+public class CitationListAdapter extends ArrayAdapter<Citation> {
 	
 	private ArrayList<Citation> bookmarks;
 	
-    public BookmarkListAdapter(Context context, int textViewResourceId, ArrayList<Citation> bookmarks) {
+    public CitationListAdapter(Context context, int textViewResourceId, ArrayList<Citation> bookmarks) {
         super(context, textViewResourceId, bookmarks);
         this.bookmarks = bookmarks;
     }
@@ -54,10 +54,10 @@ public class BookmarkListAdapter extends ArrayAdapter<Citation> {
          	TextView td = (TextView) v.findViewById(R.id.bookmark_description);
          	TextView tu = (TextView) v.findViewById(R.id.bookmark_tags);
             if (td != null) {
-               	td.setText(o.getDescription());                            
+               	td.setText(o.getTitle());                            
             }
             if (tu != null) {
-               	tu.setText(o.getTags());                            
+               	tu.setText(o.getItemType());                            
             }
 
         }

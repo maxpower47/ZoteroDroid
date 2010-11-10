@@ -117,8 +117,7 @@ class Authenticator extends AbstractAccountAuthenticator {
         final String password = am.getPassword(account);
         
         if (password != null) {
-            final boolean verified =
-                onlineConfirmPassword(account, password);
+            final boolean verified = onlineConfirmPassword(account, password);
             if (verified) {
                 final Bundle result = new Bundle();
                 result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
@@ -169,11 +168,9 @@ class Authenticator extends AbstractAccountAuthenticator {
     	final AccountManager am = AccountManager.get(mContext);
     	final String authtype = am.getUserData(account, Constants.PREFS_AUTH_TYPE);
     	
-    	if(authtype.equals(Constants.AUTH_TYPE_ZOTERO)){
-    		return NetworkUtilities.zoteroAuthenticate(account.name, password, null, null);
-    	} else {
-    		return true;
-    	}
+
+    	return true;
+
     	
     }
 

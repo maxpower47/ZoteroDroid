@@ -64,7 +64,7 @@ public class Main extends AppBaseActivity {
 		    		
 		    		Intent i = new Intent();
 		    		Uri.Builder data = Constants.CONTENT_URI_BASE.buildUpon();
-		    		data.appendEncodedPath("bookmarks");
+		    		data.appendEncodedPath("citations");
 		    		data.appendQueryParameter("username", mAccount.name);
 		    		data.appendQueryParameter("recent", "1");
 		    		i.setData(data.build());

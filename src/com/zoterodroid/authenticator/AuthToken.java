@@ -47,13 +47,6 @@ public class AuthToken {
 	
 	public String getAuthToken(){
 		try {
-	    	String authtype = mAccountManager.getUserData(mAccount, Constants.PREFS_AUTH_TYPE);
-			
-	    	if(authtype.equals(Constants.AUTH_TYPE_OAUTH)) {
-	    		mToken = mAccountManager.blockingGetAuthToken(mAccount, Constants.AUTHTOKEN_TYPE, false);
-				mAccountManager.invalidateAuthToken(Constants.ACCOUNT_TYPE, mToken);
-	    	}
-	    	
 			mToken = mAccountManager.blockingGetAuthToken(mAccount, Constants.AUTHTOKEN_TYPE, false);
 		} catch (Exception e) {
 			Log.d("AuthToken Error", "blah");

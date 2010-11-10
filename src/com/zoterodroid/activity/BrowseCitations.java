@@ -29,9 +29,7 @@ import org.apache.http.auth.AuthenticationException;
 import com.zoterodroid.R;
 import com.zoterodroid.Constants;
 import com.zoterodroid.client.ZoteroApi;
-import com.zoterodroid.client.DeliciousFeed;
-import com.zoterodroid.listadapter.BookmarkListAdapter;
-import com.zoterodroid.platform.BookmarkManager;
+import com.zoterodroid.listadapter.CitationListAdapter;
 import com.zoterodroid.platform.TagManager;
 import com.zoterodroid.providers.CitationContent.Citation;
 import com.zoterodroid.providers.TagContent.Tag;
@@ -87,91 +85,46 @@ public class BrowseCitations extends AppBaseActivity {
 		
 		myself = mAccount.name.equals(username);
 		
-		ArrayList<Citation> bookmarkList = new ArrayList<Citation>();
+		ArrayList<Citation> citationList = new ArrayList<Citation>();
 		
-		if(scheme.equals("content") && path.equals("/bookmarks") && myself){
+		if(scheme.equals("content") && path.equals("/citations") && myself){
 			
 			try{	
-				if(tagname != null && tagname != "") {
-					setTitle("My Bookmarks Tagged With " + tagname);
-				} else {
-					setTitle("My Bookmarks");
-				}
 				
-				String[] projection = new String[] {Citation._ID, Citation.Url, Citation.Description, Citation.Meta, Citation.Tags};
+				String[] projection = new String[] {Citation._ID, Citation.Title, Citation.Key, Citation.Creator_Summary, Citation.Item_Type};
 				String selection = null;
 				String sortorder = null;
+
+				selection = Citation.Account + " = '" + username + "'";
+
 				
-				if(tagname != null && tagname != "") {
-					selection = "(" + Citation.Tags + " LIKE '% " + tagname + " %' OR " +
-						Citation.Tags + " LIKE '% " + tagname + "' OR " +
-						Citation.Tags + " LIKE '" + tagname + " %' OR " +
-						Citation.Tags + " = '" + tagname + "') AND " +
-						Citation.Account + " = '" + username + "'";
-				}
+				Uri citations = Citation.CONTENT_URI;
 				
-				if(recent != null && recent.equals("1")){
-					sortorder = Citation.Time + " DESC";
-				}
-				
-				Uri bookmarks = Citation.CONTENT_URI;
-				
-				Cursor c = managedQuery(bookmarks, projection, selection, null, sortorder);				
+				Cursor c = managedQuery(citations, projection, selection, null, sortorder);				
 				
 				if(c.moveToFirst()){
 					int idColumn = c.getColumnIndex(Citation._ID);
-					int urlColumn = c.getColumnIndex(Citation.Url);
-					int descriptionColumn = c.getColumnIndex(Citation.Description);
-					int tagsColumn = c.getColumnIndex(Citation.Tags);
-					int metaColumn = c.getColumnIndex(Citation.Meta);
+					int titleColumn = c.getColumnIndex(Citation.Title);
+					int keyColumn = c.getColumnIndex(Citation.Key);
+					int creatorSummaryColumn = c.getColumnIndex(Citation.Creator_Summary);
+					int itemTypeColumn = c.getColumnIndex(Citation.Item_Type);
 					
 					do {
 						
-						Citation b = new Citation(c.getInt(idColumn), c.getString(urlColumn), 
-								c.getString(descriptionColumn), "", c.getString(tagsColumn), "", 
-								c.getString(metaColumn), 0);
+						Citation b = new Citation(c.getInt(idColumn), c.getString(titleColumn), 
+								c.getString(keyColumn), c.getString(creatorSummaryColumn),
+								c.getString(itemTypeColumn));
 						
-						bookmarkList.add(b);
+						citationList.add(b);
 						
 					} while(c.moveToNext());
 						
 				}
 
-				setListAdapter(new BookmarkListAdapter(this, R.layout.bookmark_view, bookmarkList));	
+				setListAdapter(new CitationListAdapter(this, R.layout.bookmark_view, citationList));	
 			}
 			catch(Exception e){}
 			
-		} else if(scheme.equals("content") && path.equals("/bookmarks")) {
-			try{
-				if(tagname != null && tagname != "") {
-					setTitle("Bookmarks For " + username + " Tagged With " + tagname);
-				} else {
-					setTitle("Bookmarks For " + username);
-				}
-				
-		    	SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-		    	String bookmarkLimit = settings.getString("pref_contact_bookmark_results", "50");
-		    	
-				bookmarkList = DeliciousFeed.fetchFriendBookmarks(username, tagname, Integer.parseInt(bookmarkLimit));
-
-				setListAdapter(new BookmarkListAdapter(this, R.layout.bookmark_view, bookmarkList));	
-			}
-			catch(Exception e){}
-		} else if(scheme.equals("content") && path.equals("/network")){
-			try{
-				setTitle("My Network's Recent Bookmarks");
-				
-				bookmarkList = DeliciousFeed.fetchNetworkRecent(username);
-
-				setListAdapter(new BookmarkListAdapter(this, R.layout.bookmark_view, bookmarkList));	
-			}
-			catch(Exception e){}
-		} else if(scheme.equals("http") || scheme.equals("https")) {
-			String url = data.toString();
-			Intent i = new Intent(Intent.ACTION_VIEW);
-			i.setData(Uri.parse(url));
-			startActivity(i);
-			finish();
 		}
 		
 		lv = getListView();
@@ -179,13 +132,7 @@ public class BrowseCitations extends AppBaseActivity {
 	
 		lv.setOnItemClickListener(new OnItemClickListener() {
 		    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-		    	Citation b = (Citation)lv.getItemAtPosition(position);
 		    	
-		    	String url = b.getUrl();
-		    	Uri link = Uri.parse(url);
-				Intent i = new Intent(Intent.ACTION_VIEW, link);
-				
-				startActivity(i);
 		    }
 		});
 		
@@ -210,86 +157,12 @@ public class BrowseCitations extends AppBaseActivity {
 		
 		switch (aItem.getItemId()) {
 			case 0:
-				BookmarkTaskArgs args = new BookmarkTaskArgs(b, mAccount, mContext);	
-				new DeleteBookmarkTask().execute(args);	
 				return true;
 				
 			case 1:				
-				Intent addBookmark = new Intent(this, AddBookmark.class);
-				addBookmark.setAction(Intent.ACTION_SEND);
-				addBookmark.putExtra(Intent.EXTRA_TEXT, b.getUrl());
-				startActivity(addBookmark);
 				return true;
 		}
 		return false;
-	}
-	
-	private class DeleteBookmarkTask extends AsyncTask<BookmarkTaskArgs, Integer, Boolean>{
-		private Context context;
-		private Citation bookmark;
-		private Account account;
-		
-		@Override
-		protected Boolean doInBackground(BookmarkTaskArgs... args) {
-			context = args[0].getContext();
-			bookmark = args[0].getBookmark();
-			account = args[0].getAccount();
-			
-			try {
-				Boolean success = ZoteroApi.deleteBookmark(bookmark, account, context);
-				if(success){
-					BookmarkManager.DeleteBookmark(args[0].getBookmark(), context);
-					return true;
-				} else return false;
-					
-			} catch (IOException e) {
-				return false;
-			} catch (AuthenticationException e) {
-				return false;
-			}
-		}
-
-	    protected void onPostExecute(Boolean result) {
-			if(result){
-    			String[] tags = bookmark.getTags().split(" ");
-    			for(String s:tags){
-    				Tag t = new Tag(s, 1);    				
-    				TagManager.UpleteTag(t, account.name, context);
-    			}
-				
-				BookmarkListAdapter bla = (BookmarkListAdapter) lv.getAdapter();
-				bla.remove(bookmark);
-				
-				Toast.makeText(context, "Bookmark Deleted Successfully", Toast.LENGTH_SHORT).show();
-			} else {
-				Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
-			}
-			
-	    }
-	}
-
-	private class BookmarkTaskArgs{
-		private Citation bookmark;
-		private Account account;
-		private Context context;
-		
-		public Citation getBookmark(){
-			return bookmark;
-		}
-		
-		public Account getAccount(){
-			return account;
-		}
-		
-		public Context getContext(){
-			return context;
-		}
-		
-		public BookmarkTaskArgs(Citation b, Account a, Context c){
-			bookmark = b;
-			account = a;
-			context = c;
-		}
 	}
 }
 

@@ -51,7 +51,7 @@ public class CitationContentProvider extends ContentProvider {
 	private SQLiteDatabase db;
 	private DatabaseHelper dbHelper;
 	private static final String DATABASE_NAME = "ZoteroBookmarks.db";
-	private static final int DATABASE_VERSION = 12;
+	private static final int DATABASE_VERSION = 1;
 	private static final String CITATION_TABLE_NAME = "citation";
 	private static final String TAG_TABLE_NAME = "tag";
 	
@@ -75,14 +75,10 @@ public class CitationContentProvider extends ContentProvider {
 			sqlDb.execSQL("Create table " + CITATION_TABLE_NAME + 
 					" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 					"ACCOUNT TEXT, " +
-					"DESCRIPTION TEXT, " +
-					"URL TEXT, " +
-					"NOTES TEXT, " +
-					"TAGS TEXT, " +
-					"HASH TEXT, " +
-					"META TEXT, " +
-					"TIME INTEGER, " +
-					"LASTUPDATE INTEGER);");
+					"TITLE TEXT, " +
+					"KEY TEXT, " +
+					"ITEM_TYPE TEXT, " +
+					"CREATOR_SUMMARY TEXT);");
 			
 			sqlDb.execSQL("Create table " + TAG_TABLE_NAME + 
 					" (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -211,63 +207,7 @@ public class CitationContentProvider extends ContentProvider {
 	
 	private Cursor getSearchSuggestions(String query) {
 		Log.d("getSearchSuggestions", query);
-		
-		mAccountManager = AccountManager.get(getContext());
-		mAccount = mAccountManager.getAccountsByType(Constants.ACCOUNT_TYPE)[0];
-		
-		SQLiteDatabase rdb = dbHelper.getReadableDatabase();
-		
-		SQLiteQueryBuilder tagqb = new SQLiteQueryBuilder();	
-		tagqb.setTables(TAG_TABLE_NAME);
-		
-		String selection = Tag.Name + " LIKE '%" + query + "%'";
-		
-		String[] projection = new String[] {BaseColumns._ID, Tag.Name, Tag.Count};
-
-		Cursor c = tagqb.query(rdb, projection, selection, null, null, null, null);
-		
-		MatrixCursor mc = new MatrixCursor(new String[] {BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA});
-
-		int i = 0;
-		
-		if(c.moveToFirst()){
-			int nameColumn = c.getColumnIndex(Tag.Name);
-
-			do {
-				Uri.Builder data = Constants.CONTENT_URI_BASE.buildUpon();
-				data.appendEncodedPath("citations");
-				data.appendQueryParameter("username", mAccount.name);
-				data.appendQueryParameter("tagname", c.getString(nameColumn));
-				
-				mc.addRow(new Object[] {i++, c.getString(nameColumn), data.build().toString()});
-				
-			} while(c.moveToNext());	
-		}
-		c.close();
-		
-		SQLiteQueryBuilder bookmarkqb = new SQLiteQueryBuilder();	
-		bookmarkqb.setTables(CITATION_TABLE_NAME);
-		
-		String bookmarkselection = Citation.Description + " LIKE '%" + query + "%'";
-		
-		String[] bookmarkprojection = new String[] {BaseColumns._ID, Citation.Description, Citation.Url};
-
-		Cursor bookmarkc = bookmarkqb.query(rdb, bookmarkprojection, bookmarkselection, null, null, null, null);
-
-		int j = 0;
-		
-		if(bookmarkc.moveToFirst()){
-			int descColumn = bookmarkc.getColumnIndex(Citation.Description);
-			int urlColumn = bookmarkc.getColumnIndex(Citation.Url);
-
-			do {			
-				mc.addRow(new Object[] {j++, bookmarkc.getString(descColumn), bookmarkc.getString(urlColumn)});
-				
-			} while(bookmarkc.moveToNext());	
-		}
-		bookmarkc.close();
-		
-		return mc;
+		return null;
 	}
 
 	@Override

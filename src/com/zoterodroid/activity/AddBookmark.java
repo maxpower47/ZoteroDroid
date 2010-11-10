@@ -23,11 +23,7 @@ package com.zoterodroid.activity;
 
 import com.zoterodroid.R;
 import com.zoterodroid.Constants;
-import com.zoterodroid.client.ZoteroApi;
-import com.zoterodroid.platform.BookmarkManager;
-import com.zoterodroid.platform.TagManager;
 import com.zoterodroid.providers.CitationContent.Citation;
-import com.zoterodroid.providers.TagContent.Tag;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -97,9 +93,7 @@ public class AddBookmark extends Activity implements View.OnClickListener{
 		
 		Log.d("private", Boolean.toString(mPrivate.isChecked()));
 		
-		bookmark = new Citation(url, mEditDescription.getText().toString(), 
-			mEditNotes.getText().toString(), mEditTags.getText().toString(),
-			mPrivate.isChecked());
+		bookmark = null;
 		
 		BookmarkTaskArgs args = new BookmarkTaskArgs(bookmark, account, context);
 		
@@ -127,11 +121,8 @@ public class AddBookmark extends Activity implements View.OnClickListener{
     		account = args[0].getAccount();
     		
     		try {
-    			Boolean success = ZoteroApi.addBookmark(bookmark, account, context);
-    			if(success){
-    				BookmarkManager.AddBookmark(bookmark, account.name, context);
-    				return true;
-    			} else return false;
+
+    			return true;
     		} catch (Exception e) {
     			Log.d("addBookmark error", e.toString());
     			return false;
@@ -139,13 +130,7 @@ public class AddBookmark extends Activity implements View.OnClickListener{
     	}
 
         protected void onPostExecute(Boolean result) {
-    		if(result){
-    			String[] tags = bookmark.getTags().split(" ");
-    			for(String s:tags){
-    				Tag t = new Tag(s, 1);    				
-    				TagManager.UpsertTag(t, account.name, context);
-    			}
-    			
+    		if(result){   			
     			Toast.makeText(context, "Bookmark Added Successfully", Toast.LENGTH_SHORT).show();
     		} else {
     			Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show();
